@@ -1,0 +1,5 @@
+SELECT to_char(s.ts, 'YYYY-MM') as date_, count(distinct u.userid)
+FROM raw_data.user_session_channel as u
+JOIN raw_data.session_timestamp as s on u.sessionid = s.sessionid
+group by date_
+ORDER BY date_ asc
