@@ -1,0 +1,38 @@
+--assignment 1--
+
+--32번슬라이드
+
+--41번슬라이드(미완료)
+SELECT row_number() over (ORDER BY ts) rownum, * 
+From 
+(select ts, channel
+FROM raw_data.user_session_channel usc
+JOIN raw_data.session_timestamp st 
+ON usc.sessionid = st.sessionid
+WHERE userid = 251) tch
+where rownum = (select min(rownum) from tch)
+or rownum = (select max(rownum) from tch)
+
+
+
+
+--assignment 2--
+select usc.userid, sum(st.amount) sa
+FROM raw_data.user_session_channel usc
+JOIN raw_data.session_transaction st 
+ON usc.sessionid = st.sessionid
+group by userid
+order by sa desc LIMIT 10
+
+
+
+--assignment 3(미완료)-- 
+
+CREATE TABLE AS hihigh49.channel_monthly_revenue
+(
+    SELECT month(st.ts), channel, SUM(DISTINCT userid) as uniqueUsers, "paidUsers", "conversionRate", SUM(amount) as grossRevenue, "netRevenue" 
+    FROM raw_data.session_timestamp as st
+    JOIN raw_data.user_session_channel as usc on st.sessionid = usc.sessionid
+    JOIN raw_data.channel as c on usc.channel = c.channelname
+    JOIN raw_data.session_transaction as stran on st.sessionid = stran.sessionid
+)
