@@ -1,6 +1,13 @@
 --assignment 1--
 
 --32번슬라이드
+select c.channelname, count(u.userid)
+from raw_data.channel as c
+left JOIN raw_data.user_session_channel as u
+on c.channelname = u.channel
+group by 1
+order by 2 desc
+
 
 --41번슬라이드(미완료)
 SELECT row_number() over (ORDER BY ts) rownum, * 
