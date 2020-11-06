@@ -59,9 +59,9 @@ def data_extract_load():
 
 # task 지정
 redshift_connect = PythonOperator(
-	task_id = 'redshift_connect',
+	task_id = 'get_Redshift_connection',
 	#python_callable param points to the function you want to run 
-	python_callable = print_hello,
+	python_callable = get_Redshift_connection,
 	#dag param points to the DAG that this task is a part of
 	dag = dag)
 
