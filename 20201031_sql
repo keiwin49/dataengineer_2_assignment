@@ -1,0 +1,21 @@
+# assignment 1
+# begin / end 사용 및, for 문에서 슬라이서 사용하여 헤더 제외
+
+def load(lines):
+    # BEGIN과 END를 사용해서 SQL 결과를 트랜잭션으로 만들어주는 것이 좋음
+    cur = get_Redshift_connection()
+    for r in lines[1:]:
+        if r != '':
+            (name, gender) = r.split(",")
+            print(name, "-", gender)
+            sql = "BEGIN; TRUNCATE TABLE hihigh49.name_gender; INSERT INTO hihigh49.name_gender VALUES ('{name}', '{gender}'); END;".format(name=name, gender=gender)
+            print(sql)
+            cur.execute(sql)
+
+# assignment 2
+# 슬랙으로 전달드렸습니다.
+
+
+
+#assignment 3
+
