@@ -1,7 +1,7 @@
 --assignment 1--
 
 --32번슬라이드
-select c.channelname, count(u.userid)
+select c.channelname, count(DISTINCT u.userid)
 from raw_data.channel as c
 left JOIN raw_data.user_session_channel as u
 on c.channelname = u.channel
@@ -9,16 +9,17 @@ group by 1
 order by 2 desc
 
 
---41번슬라이드(미완료)
-SELECT row_number() over (ORDER BY ts) rownum, * 
+--41번슬라이드(수정_20201101)
+SELECT userid, max(CASE WHEN rn1 = 1 then channel END) first_touch, max(CASE WHEN rn2 = 1 then channel END) last_touch
 From 
-(select ts, channel
+(select userid, channel, (row_number() over (PARTITION BY userid ORDER BY ts)) rn1, (row_number() over (PARTITION BY userid ORDER BY ts desc)) rn2
 FROM raw_data.user_session_channel usc
 JOIN raw_data.session_timestamp st 
 ON usc.sessionid = st.sessionid
-WHERE userid = 251) tch
-where rownum = (select min(rownum) from tch)
-or rownum = (select max(rownum) from tch)
+)
+--WHERE rn1 = 1 or rn2 = 1
+GROUP BY userid
+ORDER BY userid
 
 
 
@@ -33,13 +34,21 @@ order by sa desc LIMIT 10
 
 
 
---assignment 3(미완료)-- 
+--assignment 3(수정_20201101)-- 
 
-CREATE TABLE AS hihigh49.channel_monthly_revenue
+CREATE TABLE hihigh49.channel_monthly_revenue AS 
 (
-    SELECT month(st.ts), channel, SUM(DISTINCT userid) as uniqueUsers, "paidUsers", "conversionRate", SUM(amount) as grossRevenue, "netRevenue" 
-    FROM raw_data.session_timestamp as st
-    JOIN raw_data.user_session_channel as usc on st.sessionid = usc.sessionid
-    JOIN raw_data.channel as c on usc.channel = c.channelname
-    JOIN raw_data.session_transaction as stran on st.sessionid = stran.sessionid
+ SELECT 
+    LEFT(st.ts, 7), 
+    channelname, 
+    count(DISTINCT userid) as uniqueUsers, 
+    count(DISTINCT CASE WHEN amount > 0 then userid END) as paidUsers, 
+    ROUND(paidUsers::decimal/NULLIF(uniqueUsers, 0)*100, 2) as conversionRate,
+    SUM(amount) as grossRevenue,
+    SUM(CASE WHEN refunded is False THEN amount END) as netRevenue
+FROM raw_data.session_timestamp as st
+LEFT JOIN raw_data.user_session_channel as usc on st.sessionid = usc.sessionid
+LEFT JOIN raw_data.channel as c on usc.channel = c.channelname
+LEFT JOIN raw_data.session_transaction as stran on st.sessionid = stran.sessionid
+GROUP BY 1, 2 
 )
