@@ -7,7 +7,7 @@ import requests
 
 dag = DAG(
 	dag_id = 'hhi_dag',
-	start_date = datetime(2020,11,06),
+	start_date = datetime(2020,11,6),
 	schedule_interval = '0 11 * * *')
 
 
@@ -59,9 +59,9 @@ def data_extract_load():
 
 # task 지정
 redshift_connect = PythonOperator(
-	task_id = 'get_Redshift_connection',
+	task_id = 'redshift_connect',
 	#python_callable param points to the function you want to run 
-	python_callable = get_Redshift_connection,
+	python_callable = print_hello,
 	#dag param points to the DAG that this task is a part of
 	dag = dag)
 
