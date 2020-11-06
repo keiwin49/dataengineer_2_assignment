@@ -2,14 +2,15 @@ from airflow import DAG
 from airflow.operators import PythonOperator
 from datetime import datetime
 
+import psycopg2
+import requests
 
 dag = DAG(
 	dag_id = 'hhi_dag',
 	start_date = datetime(2020,11,06),
 	schedule_interval = '0 11 * * *')
 
-import psycopg2
-import requests
+
 
 # Redshift connection 함수
 def get_Redshift_connection():
@@ -28,6 +29,7 @@ def get_Redshift_connection():
     conn.set_session(autocommit=True)
     return conn.cursor()
 
+# 데이터 추출 및 로드 함수
 def extract(url):
     f = requests.get(link)
     return (f.text)
@@ -55,9 +57,7 @@ def data_extract_load():
 
 
 
-========================
-
-
+# task 지정
 redshift_connect = PythonOperator(
 	task_id = 'redshift_connect',
 	#python_callable param points to the function you want to run 
